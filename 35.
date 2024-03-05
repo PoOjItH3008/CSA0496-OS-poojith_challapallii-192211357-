@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_BLOCKS 5 // Number of data blocks
+#define BLOCK_SIZE 1024 // Size of each data block (in bytes)
+
+struct IndexBlock {
+    int pointers[NUM_BLOCKS];
+};
+
+int main() {
+    struct IndexBlock index;
+    for (int i = 0; i < NUM_BLOCKS; ++i) {
+        index.pointers[i] = i + 1; // Initialize pointers sequentially
+    }
+
+    // Simulate accessing data blocks using index pointers
+    for (int i = 0; i < NUM_BLOCKS; ++i) {
+        printf("Reading data from block %d using pointer %d\n", i, index.pointers[i]);
+        // Read data from the corresponding data block
+        // ...
+    }
+
+    return 0;
+}
