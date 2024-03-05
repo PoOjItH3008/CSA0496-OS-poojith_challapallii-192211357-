@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+#define NUM_READERS 3
+#define NUM_WRITERS 2
+
+sem_t mutex; // Controls access to the shared resource
+sem_t write_lock; // Ensures exclusive access for writers
+int data = 0; // Shared resource (e.g., a database)
+int exit_flag = 0; // Global flag to indicate when to exit
+
+void *reader(void *arg) {
+    int id = *(int *)arg;
+    while (!exit_flag) {
+        // Reader wants to read
+        sem_wait(&mutex);
+
+        // Reading the shared resource
+        printf("Reader %d reads data: %d\n", id, data);
+
+        // Reader is done reading
+        sem_post(&mutex);
+    }
+}
+
+void *writer(void *arg) {
+    int id = *(int *)arg;
+    while (!exit_flag) {
+        // Writer wants to write
+        sem_wait(&write_lock);
+
+        // Writing to the shared resource
+        data++; // Increment the data (for simplicity)
+
+        printf("Writer %d writes data: %d\n", id, data);
+
+        // Writer is done writing
+        sem_post(&write_lock);
+    }
+}
+
+int main() {
+    sem_init(&mutex, 0, 1); // Initialize mutex
+    sem_init(&write_lock, 0, 1); // Initialize write lock
+
+    pthread_t readers[NUM_READERS];
+    pthread_t writers[NUM_WRITERS];
+
+    int i;
+    for (i = 0; i < NUM_READERS; ++i) {
+        int *id = malloc(sizeof(int));
+        *id = i;
+        pthread_create(&readers[i], NULL, reader, id);
+    }
+
+    for (i = 0; i < NUM_WRITERS; ++i) {
+        int *id = malloc(sizeof(int));
+        *id = i;
+        pthread_create(&writers[i], NULL, writer, id);
+    }
+
+    // Let the simulation run for a while
+    sleep(10); // Adjust the time as needed
+
+    // Set the exit flag
+    exit_flag = 1;
+
+    // Wait for threads to finish
+    for (i = 0; i < NUM_READERS; ++i) {
+        pthread_join(readers[i], NULL);
+    }
+    for (i = 0; i < NUM_WRITERS; ++i) {
+        pthread_join(writers[i], NULL);
+    }
+
+    // Clean up
+    sem_destroy(&mutex);
+    sem_destroy(&write_lock);
+
+    return 0;
+}
