@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *file;
+    char filename[] = "my_file.txt"; // Change the filename as needed
+
+    // Create or open the file for writing
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file for writing.\n");
+        return 1;
+    }
+
+    // Write content to the file
+    fprintf(file, "Hello, this is some text written to the file.\n");
+    fprintf(file, "You can add more lines here.\n");
+
+    // Close the file
+    fclose(file);
+
+    // Open the file for reading
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file for reading.\n");
+        return 1;
+    }
+
+    // Read and display the content
+    char line[100];
+    printf("File content:\n");
+    while (fgets(line, sizeof(line), file) != NULL) {
+        printf("%s", line);
+    }
+
+    // Close the file
+    fclose(file);
+
+    return 0;
+}
