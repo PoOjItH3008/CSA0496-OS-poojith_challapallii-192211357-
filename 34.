@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_RECORDS 10
+
+struct Record {
+    int id;
+    char data[50];
+};
+
+int main() {
+    FILE *file;
+    struct Record records[MAX_RECORDS];
+
+    // Create or open the file for writing
+    file = fopen("sequential_file.txt", "w");
+    if (file == NULL) {
+        perror("Error opening file for writing");
+        return 1;
+    }
+
+    // Write some sample records to the file
+    for (int i = 0; i < MAX_RECORDS; ++i) {
+        records[i].id = i + 1;
+        snprintf(records[i].data, sizeof(records[i].data), "Data for record %d", i + 1);
+        fprintf(file, "%d %s\n", records[i].id, records[i].data);
+    }
+
+    fclose(file);
+
+    // Open the file for reading
+    file = fopen("sequential_file.txt", "r");
+    if (file == NULL) {
+        perror("Error opening file for reading");
+        return 1;
+    }
+
+    // Read and display all records sequentially
+    printf("Records in the file:\n");
+    while (fscanf(file, "%d %[^\n]", &records[0].id, records[0].data) != EOF) {
+        printf("Record %d: %s\n", records[0].id, records[0].data);
+    }
+
+    fclose(file);
+
+    return 0;
+}
