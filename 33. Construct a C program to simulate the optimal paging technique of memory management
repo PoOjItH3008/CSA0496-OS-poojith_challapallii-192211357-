@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_FRAMES 3 // Number of frames in memory
+#define NUM_PAGES 8 // Number of pages in the reference string
+
+int main() {
+    int pages[] = {1, 2, 3, 4, 5, 6, 1, 2}; // Page reference string
+    int frames[NUM_FRAMES] = {0}; // Initialize frames with zeros
+    int page_faults = 0; // Count of page faults
+
+    for (int i = 0; i < NUM_PAGES; ++i) {
+        int page = pages[i];
+        int found = 0;
+        int replace_index = -1;
+
+        // Check if the page is already in memory
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            if (frames[j] == page) {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found) {
+            // Page fault: Find the page to replace
+            int farthest = i + 1; // Initialize with a large value
+            for (int j = 0; j < NUM_FRAMES; ++j) {
+                int k;
+                for (k = i + 1; k < NUM_PAGES; ++k) {
+                    if (frames[j] == pages[k]) {
+                        break;
+                    }
+                }
+                if (k == NUM_PAGES) {
+                    replace_index = j;
+                    break;
+                }
+                if (k > farthest) {
+                    farthest = k;
+                    replace_index = j;
+                }
+            }
+
+            // Replace the page
+            frames[replace_index] = page;
+            page_faults++;
+        }
+
+        // Print current state of frames
+        printf("Frames: ");
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            printf("%d ", frames[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total page faults: %d\n", page_faults);
+
+    return 0;
+}
