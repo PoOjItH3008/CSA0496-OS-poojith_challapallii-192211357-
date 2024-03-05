@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_FRAMES 3 // Number of frames in memory
+
+int main() {
+    int pages[] = {2, 3, 1, 4, 2, 5, 3, 4}; // Page reference sequence
+    int frames[NUM_FRAMES] = {0}; // Initialize frames with zeros
+    int page_faults = 0; // Count of page faults
+    int next_frame = 0; // Index for replacing frames
+
+    for (int i = 0; i < sizeof(pages) / sizeof(pages[0]); ++i) {
+        int page = pages[i];
+        int found = 0;
+
+        // Check if the page is already in memory
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            if (frames[j] == page) {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found) {
+            // Page fault: Replace the oldest page
+            frames[next_frame] = page;
+            next_frame = (next_frame + 1) % NUM_FRAMES;
+            page_faults++;
+        }
+
+        // Print current state of frames
+        printf("Frames: ");
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            printf("%d ", frames[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total page faults: %d\n", page_faults);
+
+    return 0;
+}
